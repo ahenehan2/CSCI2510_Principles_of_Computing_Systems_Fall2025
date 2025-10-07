@@ -1,0 +1,38 @@
+1. As the answer to the first exercise, list the name(s) of the people who worked together on this lab.
+
+Anne Henehan
+
+2. This compression technique works well in some cases, and poorly in others. Give an example of each.
+
+Run-length encoding (RLE) works best when the data has a lot of repetition or long stretches of the same values. For example, in test1 you can clearly see long runs of “A”s, “B”s, and “C”s, so the compression saves a lot of space. It also works really well on image files with big same-color regions (like slu_logo.bmp).
+On the other hand, RLE does poorly when the file is more random or doesn’t have long repeats. For example, something like 1mil_random (numbers 0–4 evenly mixed) or a string like ABABABAB… compresses badly — in some cases it even gets bigger because you’re adding run-length counters that don’t help.
+
+3. The compression ratio can be computed as (size before compression)/(size after compression). For example if the original file size is 20,000 bytes and the compressed size is 15,000 bytes then the compression ratio is 1.33. There are three files above of size one million bytes each: 1mil_random, 1mil_weak_bias, and 1mil_strong_bias. Each of these files contains the numbers 0-4 in random order, but the random file contains all numbers distrbuted evenly, while the weak and strong bias files shift the distribution so that the lower number values occur more often. For example, zero occurs about 20% of the time in the random file, about 75% of the time in the weak bias file, and about 90% of the time in the strong bias file.
+Which file do you think will compress best? Compute the compression ratio for each file with a compression length of one.
+
+I used wc -c before and after compressing to get the sizes, then divided original size / compressed size.
+1mil_random: original 1000000  bytes, compressed 1598828 bytes → ratio = 0.6255
+1mil_weak_bias: original 1000000 bytes, compressed 851464 bytes → ratio = 1.1744
+1mil_strong_bias: original 1000000 bytes, compressed 409084  bytes → ratio = 2.4445
+As expected, 1mil_strong_bias compressed the best since the number 0 shows up around 90% of the time, which creates really long runs. 1mil_weak_bias was in the middle, and 1mil_random barely compressed at all.
+
+
+4. The Bash shell includes the nifty command time, which records how long a command runs. Record how long it takes to compress the file test4. The syntax in this case is "time ./rle test4 output 1 0". This will report three measurements: real, user, and sys. How long does your program take to run in real time?
+
+time ./rle test4 output1 1 0
+
+Real time: 14.87s
+User/sys time: 15.99
+It ran very fast (only a fraction of a second), but I wrote down the actual times.
+
+5. Try the above command again but with a compression length of ten, how long does your program take now? Which operations happen more or less frequently now? Formulate a hypothesis as to the difference.
+
+This was slightly different than K=1. With K=10, the program processes larger blocks, so it does fewer reads/compares overall. That means fewer loops, but each comparison is a bit heavier since it’s checking more bytes at once. My guess is that with K=10, the syscall overhead goes down, which can make it faster if the data has repeating 10-byte patterns.
+
+6. Indicate which, if any, extra credit exercises have you have attempted.
+
+For slu_logo.bmp, I was able to compress and then decompress it with my program, and the image still opened normally. The compression ratio was ___ compared to the original size. Then I compared with saving it as PNG (lossless) and JPG (lossy):
+My RLE: 123456/ 133552 = 0.9244
+PNG: 123456/109154 = 1.131
+JPG: 123456/109154 = 1.131
+PNG was much more efficient than my RLE but still lossless. JPG shrank it the most, but that’s because it throws away details (lossy). On a simple logo, the difference is barely visible.
