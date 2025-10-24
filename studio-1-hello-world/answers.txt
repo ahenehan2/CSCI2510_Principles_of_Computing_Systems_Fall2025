@@ -1,0 +1,53 @@
+CSCI 2510 — Studio: Hello, world!
+Name: Anne Henehan
+Date: 2025-09-11
+
+2) Header(s) needed for fprintf():
+   #include <stdio.h>
+
+3) Difference in the signatures:
+   fprintf(FILE *restrict stream, const char *restrict format, ...);
+   printf(const char *restrict format, ...);
+   -> fprintf() needs you to say where to print (a FILE*), while printf()
+      always just goes to stdout.
+
+4) Difference in the description:
+   fprintf() writes to whatever stream you pass in (like a file or stdout).
+   printf() is basically the same thing but it’s hardcoded to print to stdout.
+
+5) Compiling and running hello_fprintf.c:
+   $ gcc hello_fprintf.c -o hello_fprintf
+   $ ./hello_fprintf
+   Hello, world!
+
+7) Section number for system calls:
+   2
+
+8) Header needed for write():
+   #include <unistd.h>
+
+9) Copy command (left blank per instructions).
+
+11) Code for hello_write.c (final version used):
+   #include <unistd.h>
+   int main(int argc, char* argv[]) {
+       const char msg[] = "Hello, world!\n";
+       write(STDOUT_FILENO, msg, sizeof(msg) - 1);
+       return 0;
+   }
+
+10) What happens if you make the size way bigger than the string:
+    It’ll try to read past the end of the buffer. Sometimes you’ll just get
+    “Hello, world!” and then random garbage characters, or you might crash
+    depending on memory. Basically undefined behavior.
+
+11) When to use C library vs system call:
+    - C library (fprintf, fopen, etc.): if you want code that’s portable and
+      easy to read, and you don’t need super low-level control.
+    - System call (write, open, etc.): if you want exact control, performance,
+      or you’re doing something OS-specific (like messing with file descriptors
+      directly).
+
+12) Running hello.sh:
+   $ ./hello.sh
+   Hello World!

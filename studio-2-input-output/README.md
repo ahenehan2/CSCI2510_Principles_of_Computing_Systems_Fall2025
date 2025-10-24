@@ -37,6 +37,8 @@ source code to Canvas.
     CTRL-D at an empty terminal prompt, it's likely that your terminal will
     close itself!
 
+    My response: Running `cat` with no arguments echoed each line I typed to the terminal immediately; pressing CTRL-D on a blank line sent EOF and exited `cat`.
+
 2.  The original purpose of `cat` is to print text files to the console.
     Find your favorite text file if you\'d like, or you can use one
     of mine. This repository should already contain the `mars.txt` file
@@ -52,6 +54,8 @@ source code to Canvas.
 
     As the answer to this exercise, describe what happens.
 
+    My response: The contents of `mars.txt` printed to the terminal; stdin was redirected from the file instead of the keyboard.
+
 3.  We can also redirect output. This time, redirect standard output
     with the \'`>`\' character into a new text file. Use the syntax:
 
@@ -60,6 +64,8 @@ source code to Canvas.
     Open up the `new.txt` file. As the answer to this exercise, describe
     what happens.
 
+    My response: Nothing printed to the screen because stdout was redirected to `new.txt`. Opening `new.txt` shows an exact copy of `mars.txt` (overwrites if it already existed).
+
 4.  Now try the following command `cat > new.txt`
 
     Enter a few lines of text by pressing enter. Open up your text file to see the
@@ -67,11 +73,15 @@ source code to Canvas.
 
     As the answer to this exercise, describe what happens.
 
+    My response: The lines I typed were written into `new.txt`; single `>` overwrote any previous contents. CTRL-D ended input.
+
 5.  One last useful tip. Repeat the last exercise, but instead of using
     a single greater-than symbol, use two. (That is, use \'`>>`\'
     instead of \'`>`\'). Try running this command several times.
 
     What happens now?
+
+    My response: Using `>>` appended my new lines to the end of `new.txt`. Re-running the command continues appending.
 
 6.  Now we\'ll write a short program that mimics the behavior of `cat`.
     Start by creating a new file called `copy.c` and fill it out with
@@ -82,6 +92,8 @@ source code to Canvas.
     `write()`, and look at your code from Studio 01 to see how you used
     `write()`. What header file do you need to include to use these
     system calls?
+
+    My response: `#include <unistd.h>` (provides `read()`, `write()`, `STDIN_FILENO`, and `STDOUT_FILENO`).
 
 7.  Both functions require a *buffer* (a fixed region of memory) to
     operate. At the top of your program, before the `main()` declaration,
@@ -100,6 +112,10 @@ source code to Canvas.
     system call. What is the return value ***type*** for `read()`? What
     is the specific return value that indicates the end of a file?
 
+    My response: Return type is `ssize_t`. EOF is indicated when `read()` returns `0` (errors return `-1` with `errno` set).
+
+
+
 9.  Your last job is to translate the following algorithm into C code.
     Inside an infinite loop:
 
@@ -116,13 +132,22 @@ source code to Canvas.
 
     `./copy < mars.txt`
 
+    My response: Implemented in `copy.c` using a loop that reads into a buffer, breaks on `read()` returning 0 (EOF), and writes exactly the number of bytes read (handling short writes and `EINTR`). Tested with `./copy`, `./copy < mars.txt`, and `./copy < mars.txt > out.txt`; behavior matches `cat`.
+
 10. Do you think that modifying `bufferSize` will affect the correctness
     of your program? What if `bufferSize` is very small, or even equal
     to one? Try a few different values for `bufferSize` and record the
     results.
 
+    My response: Changing `bufferSize` does not affect correctness because I always write exactly the number of bytes returned by `read()`. With very small buffers (e.g., 1), output is still correct but slower (more system calls). Larger buffers (e.g., 4096) are faster on large files.
+
+
 11. What do you think the tradeoff is between having a small
     `bufferSize` versus having a large one?
+
+    My response: Small buffer ⇒ minimal memory but many syscalls (slower). Large buffer ⇒ fewer syscalls (usually faster) but more memory with diminishing returns beyond a few KB. A practical default range is 1–8 KB.
+
+
 
 ### Optional Enrichment Exercises
 

@@ -1,0 +1,5 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     '/Users/anniehenehan/Documents/CSCI2510_Principles_of_Computing_Systems_Fall2025/studio-2-input-output/copy'
+relocations:     []
+...

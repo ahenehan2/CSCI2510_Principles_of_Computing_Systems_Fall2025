@@ -107,6 +107,11 @@ text file. When finished, submit your work via Canvas.
 
     As the answer to this question, copy-paste your for-loop.
 
+ for (int i = 0; messagePtr[i] != '\0'; ++i) {
+    printf("%c\n", messagePtr[i]);
+}
+   
+
 4.  The *dereference operator* in C is the asterisk (`*`) and is also
     important when using pointers. Just like indexing a pointer, the
     dereference operator obtains the *value* of the data that is pointed
@@ -116,6 +121,10 @@ text file. When finished, submit your work via Canvas.
     character does it point to? In other words, what do you think is the
     value of the dereference operation `*messagePtr`?
 
+    The value of *messagePtr is 'H'. Since messagePtr points to the start of the string "HELLOWORLD!", dereferencing it gives me the very first character. In other words, *messagePtr is the same as writing messagePtr[0], so it points to 'H'.
+
+
+
 5.  Check your answer to the last exercise by dereferencing `messagePtr`
     and printing it out. The dereference operator is the asterisk when
     placed to the left of a pointer. You can print out a single
@@ -124,6 +133,10 @@ text file. When finished, submit your work via Canvas.
     `printf("%c\n", *pointer_to_string);`
 
     What was printed?
+
+    When I actually dereferenced messagePtr and printed it out with printf("%c\n", *messagePtr);, the program printed H. That makes sense because the pointer is aimed at the first character in the string.
+
+
 
 6.  Another way to use pointers is with *pointer arithmetic*. Suppose we
     have a regular string pointer called *ptr*, as seen above this
@@ -144,9 +157,30 @@ text file. When finished, submit your work via Canvas.
     pointer arithmetic. To do so, add one, two, or three to the pointer
     before dereferencing. For example: `*(messagePtr + 1)`.
 
+    If messagePtr points to "HELLOWORLD!", then:
+*(messagePtr + 1) → E
+*(messagePtr + 2) → L
+*(messagePtr + 3) → L
+
+printf("%c\n", *(messagePtr + 1)); // E
+printf("%c\n", *(messagePtr + 2)); // L
+printf("%c\n", *(messagePtr + 3)); // L
+
+for (const char *p = messagePtr; *p != '\0'; ++p) {
+    printf("%c\n", *p);
+}
+
+That loop starts the pointer at the first char, advances it one byte at a time, and stops at the '\0' terminator—same idea as indexing, just written in pointer form.
+
 7.  Write a second for-loop to print the entire contents of the string
     using pointer arithmetic, one character at a time. As the answer to
     this question, copy and paste your new for-loop.
+
+    for (const char *p = messagePtr; *p != '\0'; ++p) {
+    printf("%c\n", *p);
+}
+
+This way I’m not using the [] index operator at all — just pointer arithmetic and dereferencing to walk through the string one character at a time.
 
 8.  It\'s easy to use pointers with strings when we know exactly what
     the string is. It\'s harder when we don\'t. For example, how did you
@@ -171,6 +205,12 @@ text file. When finished, submit your work via Canvas.
     value as your loop condition. You can use the keyword `NULL` or the
     null character `'\0'` to compare against. As the answer to this
     question copy-paste your while loop.
+
+    const char *p = messagePtr;
+while (*p != '\0') {
+    printf("%c\n", *p);
+    p++;
+}
 
 9. It\'s also important to understand how pointers are treated when
     calling functions. Recall that the two basic ways to pass arguments
@@ -214,6 +254,19 @@ text file. When finished, submit your work via Canvas.
 
     As the answer to this exercise, copy-paste your function.
 
+void printReverse(char *string) {
+    // Find length manually (stop at null terminator)
+    int len = 0;
+    while (string[len] != '\0') {
+        ++len;
+    }
+
+    // Print characters in reverse, one per line
+    for (int i = len - 1; i >= 0; --i) {
+        printf("%c\n", string[i]);
+    }
+}
+
 10. For our last exercise, we will write a second function that
     creates a reversed copy of an input string. Feel free to borrow code
     from any of the other exercises you\'ve done. Start with the
@@ -255,6 +308,33 @@ text file. When finished, submit your work via Canvas.
         printf("Reversed string: %s\n", reversedMessage);
 
     As the answer to this exercise, copy-paste your last function.
+
+#include <stdlib.h>
+
+char* reverseString(char* input) {
+    // 1. Count how many characters are in the input string
+    int len = 0;
+    while (input[len] != '\0') {
+        ++len;
+    }
+
+    // 2. Allocate space for reversed string (+1 for null terminator)
+    char* output = (char*)malloc(len + 1);
+    if (output == NULL) {
+        return NULL; // malloc failed
+    }
+
+    // 3. Copy characters from input into output in reverse order
+    for (int i = 0; i < len; ++i) {
+        output[i] = input[len - 1 - i];
+    }
+
+    // 4. Null-terminate the new string
+    output[len] = '\0';
+
+    return output;
+}
+
 
 ### Optional Enrichment Exercises
 

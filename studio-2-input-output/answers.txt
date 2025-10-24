@@ -1,0 +1,38 @@
+CSCI 2510: Studio – Input/Output
+Name: Anne Henehan
+
+1) Running just `cat`, then typing lines, then CTRL-D:
+- What happened: The lines I typed were echoed back immediately. `cat` read from standard input (keyboard) and wrote to standard output (terminal) until I sent EOF with CTRL-D on a blank line.
+- Extra note: CTRL-D sends EOF; many terminal-style programs stop on EOF.
+
+2) `cat < mars.txt`
+- What happened: The contents of mars.txt printed to the terminal (stdin was redirected from the file into cat).
+
+3) `cat < mars.txt > new.txt`
+- What happened: Nothing printed to the screen because stdout was redirected. A new file `new.txt` was created (or overwritten) and it contains exactly the content of `mars.txt`.
+
+4) `cat > new.txt` then I typed a few lines and pressed CTRL-D
+- What happened: `new.txt` now contains exactly the lines I typed. Using single `>` overwrites the file.
+
+5) Using `>>` (append): `cat >> new.txt`
+- What happened: My new lines were appended to the end of `new.txt`. Running the command multiple times keeps adding more lines.
+
+6) Header to use for read()/write():
+- Answer: `#include <unistd.h>`
+
+7) Return value and EOF for read():
+- Type: `ssize_t`
+- EOF value: `0` indicates end-of-file (and `-1` indicates error with errno set).
+
+8) Does changing `bufferSize` affect correctness? What about very small values?
+- Observations: Correctness is unchanged (we only write the exact number of bytes we read each time).
+- Even with `bufferSize = 1`, output is still correct; it’s just less efficient (many more system calls).
+
+9) Tradeoff: small vs. large buffers
+- Small buffer: lower memory use but more system-call overhead → slower for large files.
+- Large buffer: fewer syscalls and generally faster, but more memory use and potential cache effects.
+- A moderate size (e.g., 1–8 KB) is a common practical choice.
+
+10) My code files:
+- `copy.c` (system-call version)
+- [Optional] `copy_libc.c` (stdio version using fgets()/fprintf())

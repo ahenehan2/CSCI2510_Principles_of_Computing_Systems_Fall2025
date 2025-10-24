@@ -1,1 +1,5 @@
-//Replace this file with the contents of your hello.sh
+
+#!/usr/bin/env bash
+# Prints Hello World using the shell
+
+echo "Hello World!"
