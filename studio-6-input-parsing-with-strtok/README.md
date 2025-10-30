@@ -38,6 +38,11 @@ text file. When finished, submit your work via the Git repository.
 
     Copy and paste the output of your program once it runs correctly.
 
+    Answer: 
+
+    Enter something: this is my test input
+this is my test input
+
 2.  Now we want to parse the input string and divide it into individual
     *tokens*. For this we can use the function `strtok()`, which parses
     a string from left to right and returns one token each time you call
@@ -45,18 +50,33 @@ text file. When finished, submit your work via the Git repository.
     paragraph. What difference is there between the initial call to
     `strtok()` and subsequent calls that parse the same string?
 
+    Answer: On the first call you pass the string to tokenize as the first argument; on subsequent calls you pass NULL as the first argument so strtok() continues tokenizing the same original string from where it left off. It also writes '\0' into the original string to terminate each token as it goes.
+
 3.  The *delimiter* character tells the `strtok()` function which
     character marks the boundary of tokens. What delimiter character
     should you use for regular text input?
+
+    Answer: For regular text input use space and tabs as delimiters
+    example: const char *delims = " \t";
 
 4.  Make a call to `strtok()` so that your program parses the first
     token from the user input. Print this first token on a new line.
 
     Copy and paste your program output once this works correctly.
+Answer: 
+    this
 
 5.  Now use an appropriate loop so that your program parses and prints
     each token in the user input on a separate line. Copy and paste your
     program output once this is done.
+
+    Answer:
+    Enter something: this is an input string
+    this
+    is
+    an
+    input
+    string
 
 6.  One strange artifact you might notice is an extra newline that is
     printed after the last token. This is because your input string
@@ -79,6 +99,9 @@ text file. When finished, submit your work via the Git repository.
 
     As the answer to this exercise, copy and paste your newline
     stripping code.
+
+    Answer: 
+    buffer[strcspn(buffer, "\n")] = '\0';
 
 7.  Lastly, we want to re-purpose this studio program as a springboard
     to executing arbitrary programs for Lab 2. Rather than just
@@ -105,6 +128,9 @@ text file. When finished, submit your work via the Git repository.
     Copy and paste your assignment statement as the answer to this
     exercise.
 
+    Answer: 
+    cmd = first;
+
 9. Filling out `my_argv` is slightly trickier. First, observe that
     `my_argv` is simply an array of `char*` pointers. Second, recall
     that the regular `argv` variable always has the name of the command
@@ -129,6 +155,19 @@ text file. When finished, submit your work via the Git repository.
 
     Copy and paste your `my_argv[]` code as the answer.
 
+    int i = 0;
+    my_argv[i++] = cmd;                 
+
+    for (char *res = strtok(NULL, " \t"); 
+        res != NULL && i < max_argv_size - 1; 
+        res = strtok(NULL, " \t")) {
+        my_argv[i++] = res;             
+    }
+
+    my_argv[i] = NULL;
+
+
+
 10. Lastly, after you have constructed `cmd` and `my_argv`, insert the
     following call to `execvp()`:
 
@@ -139,6 +178,16 @@ text file. When finished, submit your work via the Git repository.
     execute, and then execute that program with `execvp()`
 
     Copy and paste a working output as the answer to this question.
+
+    Answer:
+
+    $ ./mini_shell
+    Enter a command: echo hello there
+    First token: echo
+    echo
+    hello
+    there
+    hello there
 
 ### Optional Enrichment Exercises
 
