@@ -54,6 +54,33 @@ text file. When finished, submit your work via the Git repository.
     of file character (CTRL-D). Once finished, copy and paste these
     programs as the answer to this question.
 
+program 1:
+    #include <stdio.h>
+
+int main(void) {
+    printf("Program 1 output line\n");
+    return 0;
+}
+
+program 2: 
+#include <stdio.h>
+
+int main(void) {
+    char input[256];
+
+    while (1) {
+        // read from stdin
+        if (fgets(input, sizeof(input), stdin) == NULL) {
+            // EOF or error -> stop
+            break;
+        }
+        // print with prefix
+        printf("Program 2 got: %s", input);
+    }
+
+    return 0;
+}
+
 2.  Now, create a new program called `pipe.c`. This program should
     `fork()` and `execvp()` two children. The first child should
     `execvp()` your Program 1, and the second child should `execvp()`
@@ -72,6 +99,11 @@ text file. When finished, submit your work via the Git repository.
 
     Copy and paste your program output as the answer to this exercise.
 
+    Answer:
+    Program 2 got: Program 1 output line
+
+
+
 3.  Now we will create a pipe to connect the two child processes. In the
     parent, before the first call to `fork()`, make a call to `pipe()`.
     This function accepts a single argument of type `int fd[2]`.
@@ -79,6 +111,9 @@ text file. When finished, submit your work via the Git repository.
     Look at the manual page at `man 2 pipe`. Which element of `fd[2]`
     contains the read end of the pipe after `pipe()` successfully
     returns? Which elemnt contains the write end?
+
+    answer:
+    The read end is fd[0] and the write end is fd[1].
 
 4.  Our goal now is to write the output of Program 1 into the input of
     Program 2. However, we don\'t want to have to modify Program 1 or
@@ -99,12 +134,35 @@ text file. When finished, submit your work via the Git repository.
     The function `dup2()` takes two arguments. Which argument is
     *closed* when the function succeeds?
 
+    In dup2(oldfd, newfd), the second argument (newfd) is the one that is closed and replaced.
+
+    Answer: 
+    In dup2(oldfd, newfd), the second argument (newfd) is closed and replaced.
+
 5.  Now use the `dup2()` function in the manner described in the
     previous exercise. Insert the call to `dup2()` after forking the
     first child, but before executing your Program 1. Replace the
     `STDOUT_FILENO` descriptor with the write end of the pipe.
     Similarly, replace `STDIN_FILENO` with the read end of the pipe in
     your second child. Copy and paste your `dup2()` code.
+
+    Child 1:
+    if (dup2(fd[1], STDOUT_FILENO) == -1) {
+    perror("dup2 child1");
+    exit(1);
+    }
+    close(fd[0]);
+    close(fd[1]);
+
+    Child 2: 
+    if (dup2(fd[0], STDIN_FILENO) == -1) {
+    perror("dup2 child2");
+    exit(1);
+    }
+    close(fd[1]);
+    close(fd[0]);
+
+
 6.  Now execute your `pipe.c` program. The output of your Program 1
     should be read in by your Program 2, and then re-printed with the
     Program 2 preface. For example, your output might read:
@@ -117,6 +175,9 @@ text file. When finished, submit your work via the Git repository.
     shortcut to kill your processes.
 
     Copy and paste your program output as the answer to this exercise.
+
+Answer:
+    Program 2 got: Program 1 output line
 
 7.  The reason your Program 2 does not terminate is because it will
     continually check the read end of your pipe for more data as long as
@@ -136,6 +197,14 @@ text file. When finished, submit your work via the Git repository.
     Once the above steps are complete, the `pipe.c` should execute and
     then terminate correctly. Copy and paste your output.
 
+    Answer:
+    parent: close both ends
+    child 1: close read end
+    child 2: close write end
+
+
+
+
 8.  If you think about it, you just achieved a pretty impressive feat.
     You just shared data between two programs who had no idea that each
     other existed. In fact, your programs have no idea where their data
@@ -146,6 +215,10 @@ text file. When finished, submit your work via the Git repository.
     channel, and the operating system seamlessly does all the heavy
     lifting in the background. Give two advantages to this stream
     ambiguity.
+
+    Answer: 
+    1. Programs can be reused in different pipelines without changing their code.
+    2. The OS can connect programs flexibly (files, pipes, sockets) so you can build complex workflows from simple tools.
 
 ### Optional Enrichment Exercises
 
