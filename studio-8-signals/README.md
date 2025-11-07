@@ -32,6 +32,18 @@ text file. When finished, submit your work via the Git repository.
 
     Copy and paste some program output as the answer to this exercise.
 
+    answer: 
+$ gcc -o sleep sleep.c
+$ ./sleep
+Sleeper's PID is: 21437
+Slept for 0 iterations!
+Slept for 1 iterations!
+Slept for 2 iterations!
+Slept for 3 iterations!
+Slept for 4 iterations!
+^C
+$
+
 2.  When you press CTRL-C on the keyboard you\'re actually generating a
     special signal called the *interrupt signal*, or *SIGINT* for short.
     The default behavior of this signal is to kill the recieving
@@ -42,6 +54,9 @@ text file. When finished, submit your work via the Git repository.
     Open the manual page at `man 7 signal` or `man 3 signal` on MacOS. Scroll down to the list of
     standard signals. What numeric value does SIGINT have? What is the
     associated comment?
+
+    answer:
+    SIGINT is signal 2, and the comment is "Interrupt from keyboard".
 
 3.  Open a second terminal. Start the `sleep.c` program in the first
     terminal and make a note of its PID. In the second terminal use the
@@ -54,9 +69,17 @@ text file. When finished, submit your work via the Git repository.
 
     What happens to the sleeper process?
 
+    answer:
+    The sleep process receives SIGINT (2) and is terminated, just like when you press CTRL-C in that terminal.
+
 4.  Go back to `man 7 signal` (or `man 3 signal` on MacOS) and look through the list of standard
     signals. Pick another signal to send to a sleeping process. What
     signal did you pick? What happened? Copy and paste the results.
+
+    answer:
+    
+I picked SIGTERM (15).
+Result: the sleeper process was terminated and the shell printed Terminated ./sleep.
 
 5.  Now download the program [call\_sleeper.c](./call_sleeper.c). This
     program `fork()`s and `exec()`s a sleeper program, and then waits
@@ -66,6 +89,9 @@ text file. When finished, submit your work via the Git repository.
     Try finishing and running `call_sleeper.c` and then terminating the sleeper with
     CTRL-C. Which processes terminate: the sleeper, the caller, or both?
     Did the calling program print its success message?
+
+    answer:
+    Both the caller and the sleeper are terminated by CTRL-C, and the calling program does not print its success message.
 
 6.  We want to be able to interrupt the sleeper process without
     interrupting the caller process. To do so, we can define a custom
@@ -91,6 +117,21 @@ text file. When finished, submit your work via the Git repository.
 
     Copy and paste your signal handling code.
 
+    answer: 
+    #include <signal.h>
+
+void handle_sigint(int signum) {
+    printf("\nParent: received SIGINT (%d) but is ignoring it.\n", signum);
+}
+
+int main(int argc, char* argv[]) {
+    if (signal(SIGINT, handle_sigint) == SIG_ERR) {
+        perror("signal");
+        exit(-1);
+    }
+
+}
+
 7.  Finally, run your new caller program and interrupt it with CTRL-C.
     If done correctly, your sleeper should terminate but your caller
     should simply print your statement that SIGINT is being ignored.
@@ -98,6 +139,20 @@ text file. When finished, submit your work via the Git repository.
     successfully waited for the sleeper.
 
     Copy and paste your program output.
+
+answer: 
+$ gcc -o call_sleeper call_sleeper.c
+$ ./call_sleeper
+Forking sleeper...
+Waiting for sleeper 22567...
+Sleeper's PID is: 22567
+Slept for 0 iterations!
+Slept for 1 iterations!
+Slept for 2 iterations!
+^C
+Parent: received SIGINT (2) but is ignoring it.
+Parent finished waiting and returned successfully!
+$
 
     *NOTE: Once you handle SIGINT in this way, you will no longer be
     able to kill your process with CTRL-C. If you run into trouble you
@@ -111,11 +166,21 @@ text file. When finished, submit your work via the Git repository.
     to the GUI process to tell it to terminate. Give another situation
     where signal handling might be useful.
 
+    answer:
+    Another place where signal handling is useful is when a parent process needs to react to its children finishing. When a child process exits, the OS can send the parent a SIGCHLD signal. The parent can catch SIGCHLD with a signal handler, call waitpid() to reap the child, and free any associated resources. This lets the parent handle child termination asynchronously, without constantly polling.
+
 ### Optional Enrichment Exercises
 
 1.  One frequently used program that handles SIGINT with a custom
     handler is the terminal shell. Try pressing CTRL-C at an empty
     terminal- what happens? Why is this behavior important?
+
+    You want CTRL-C to cancel the current foreground command (like cat, sleep, your C program, etc.), not destroy your entire shell session.
+- If the shell died every time you hit CTRL-C with nothing running, you’d constantly lose your environment, history, and any work you had sitting around.
+- By handling SIGINT with a custom handler, the shell can:
+Kill child processes when needed
+Stay alive itself
+Keep giving you a prompt to run new commands
 
 2.  Linux provides two user-defined signals SIGUSR1 and SIGUSR2
     specifically for implementing program functionality on top of
